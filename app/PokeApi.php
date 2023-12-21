@@ -11,6 +11,12 @@ class PokeApi
 
     public function getUrlApi()
     {
-        return $this->urlApi;
+        try {
+            return new Client([
+                'base_uri' => $this->urlApi,
+            ]);
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 }

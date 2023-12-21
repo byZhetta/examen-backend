@@ -10,5 +10,5 @@ class Pokemon extends Model
 
     public $table = "pokemones";
 
-    protected $fillable = ['nombre', 'tipo'];
+    protected $fillable = ['id', 'nombre', 'tipo'];
 }

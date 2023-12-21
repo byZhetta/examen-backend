@@ -1,4 +1,6 @@
 <?php
+use Illuminate\Support\Facades\Route;
+
 Route::prefix('entrenadores')->group(function () {
     Route::post('crear', 'EntrenadorController@crear');
     Route::get('{id}', 'EntrenadorController@detalle')
