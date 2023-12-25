@@ -58,8 +58,60 @@ class EquipoController extends Controller
         }
     }
 
-    public function crear()
+    public function crear(Request $request)
     {
-        //
+        try {
+            $request->validate([
+                'id_entrenador' => 'required|exists:entrenadores,id',
+                'nombre' => 'required'
+            ]);
+
+            $equipo = new Equipo([
+                'id_entrenadores' => $request->id_entrenador,
+                'nombre' => $request->nombre
+            ]);
+            $equipo->save();
+
+            $eq_creado = DB::table('equipos')
+                ->max('id');
+            $search = DB::table('equipos_pokemones')
+                ->select('id_pokemones')
+                ->get();
+            
+            if (count($search)) {
+                foreach ($search as $search) {
+                    $pokemones = DB::table('pokemones')
+                        ->select('id')
+                        ->where('id', '!=', $search->id_pokemones)
+                        ->orderBy('id', 'asc')
+                        ->limit(3)
+                        ->get();
+                }   
+            } else {
+                $pokemones = DB::table('pokemones')
+                    ->select('id')
+                    ->orderBy('id', 'asc')
+                    ->limit(3)
+                    ->get();     
+            }
+
+            $i = 1;
+            foreach ($pokemones as $pokemon) {
+                $equipo_pokemon = new EquipoPokemon([
+                    'id_equipo' => $eq_creado,
+                    'id_pokemones' => $pokemon->id,
+                    'orden' => $i
+                ]);
+                $equipo_pokemon->save();
+                $i++;
+            }
+
+            return [
+                'status' => 'ok',
+                'message' => 'Equipo creado exitosamente!.'
+            ];
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 }
