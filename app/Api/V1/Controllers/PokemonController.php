@@ -21,4 +21,28 @@ class PokemonController extends Controller
             throw $e;
         }
     }
+
+    public function detalle($id) 
+    {
+        $pokemon = null;
+        try {
+            $pokemon = Pokemon::select(
+                'id', 'nombre', 'tipo'
+            )
+                ->where('id', $id)
+                ->get()
+                ->toArray();
+
+            if (empty($pokemon)) {
+                throw new Exception("No se encontro el pokemon.");
+            }
+
+            return [
+                'status' => 'ok',
+                'pokemon' => $pokemon
+            ];
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
 }

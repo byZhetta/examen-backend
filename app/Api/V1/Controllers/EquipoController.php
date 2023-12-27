@@ -36,10 +36,10 @@ class EquipoController extends Controller
                 'pokemones.id as id_pokemones',
                 'pokemones.nombre as nombre_pokemones',
                 'pokemones.tipo as tipos_pokemones',
-                'equipo_pokemones.orden as orden_pokemones'
+                'equipos_pokemones.orden as orden_pokemones'
             )
-                ->join('equipo_pokemones', 'equipo_pokemones.id_equipos', 'equipos.id')
-                ->join('pokemones', 'pokemones.id', 'equipo_pokemones.id_pokemones')
+                ->join('equipos_pokemones', 'equipos_pokemones.id_equipos', 'equipos.id')
+                ->join('pokemones', 'pokemones.id', 'equipos_pokemones.id_pokemones')
                 ->where('equipos.id', $id)
                 ->get()
                 ->toArray();
@@ -76,17 +76,19 @@ class EquipoController extends Controller
                 ->max('id');
             $search = DB::table('equipos_pokemones')
                 ->select('id_pokemones')
+                ->groupBy('id_pokemones')
                 ->get();
-            
+
             if (count($search)) {
+                $poke_array = array();
                 foreach ($search as $search) {
-                    $pokemones = DB::table('pokemones')
-                        ->select('id')
-                        ->where('id', '!=', $search->id_pokemones)
-                        ->orderBy('id', 'asc')
-                        ->limit(3)
-                        ->get();
+                    $poke_array[] = $search->id_pokemones;
                 }   
+                $pokemones = DB::table('pokemones')
+                    ->select('id')
+                    ->whereNotIn('id', $poke_array)
+                    ->limit(3)
+                    ->get();
             } else {
                 $pokemones = DB::table('pokemones')
                     ->select('id')
@@ -98,7 +100,7 @@ class EquipoController extends Controller
             $i = 1;
             foreach ($pokemones as $pokemon) {
                 $equipo_pokemon = new EquipoPokemon([
-                    'id_equipo' => $eq_creado,
+                    'id_equipos' => $eq_creado,
                     'id_pokemones' => $pokemon->id,
                     'orden' => $i
                 ]);
